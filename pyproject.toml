@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "simple-simcse-ja"
+version = "0.1.0"
+description = ""
+authors = ["hppRC <hpp.ricecake@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "3.9.x"
+torch = { url = "https://download.pytorch.org/whl/cu113/torch-1.12.1%2Bcu113-cp39-cp39-linux_x86_64.whl" }
+transformers = "^4.24.0"
+tokenizers = "^0.13.2"
+datasets = "^2.6.1"
+classopt = "^0.1.9"
+tensorflow = "^2.10.0"
+tensorflow-cpu = "^2.10.0"
+swig = "^4.1.0"
+mecab-python3 = "^1.0.5"
+pyknp = "^0.6.1"
+fugashi = "^1.2.0"
+unidic-lite = "^1.0.8"
+tqdm = "^4.64.1"
+pandas = "^1.5.1"
+mteb = "^1.0.0"
+more-itertools = "^9.0.0"
+scipy = "^1.9.3"
+scikit-learn = "^1.1.3"
+apache-beam = { extras = ["gcp"], version = "^2.42.0" }
+ipadic = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
