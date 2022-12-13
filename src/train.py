@@ -1,12 +1,9 @@
-import json
-import os
 import random
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -16,15 +13,14 @@ from mteb import MTEB
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-from transformers import AutoModel, AutoTokenizer, logging
+from transformers import AutoModel, AutoTokenizer
 from transformers.modeling_outputs import BaseModelOutput
 from transformers.modeling_utils import PreTrainedModel
 from transformers.optimization import get_linear_schedule_with_warmup
 from transformers.tokenization_utils import BatchEncoding, PreTrainedTokenizer
 
+import src.utils as utils
 from src.sts import STSEvaluation
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 @classopt(default_long=True)
@@ -120,8 +116,9 @@ class Experiment:
         convert_to_numpy: bool = False,
         **_,
     ) -> torch.Tensor:
-        embs = []
         self.model.eval()
+
+        embs = []
         for batch in self.create_loader(
             sentences,
             batch_size=batch_size or self.batch_size,
@@ -130,6 +127,7 @@ class Experiment:
             emb = self.model.forward(**batch.to(args.device))
             embs.append(emb.cpu())
         embs = torch.cat(embs, dim=0)
+
         if convert_to_numpy:
             embs = embs.numpy()
         return embs
@@ -141,6 +139,9 @@ class Experiment:
     def sts_test(self):
         self.model.eval()
         return self.sts(encode=self.encode)
+
+    def clone_state_dict(self) -> Dict:
+        return {k: v.detach().clone() for k, v in self.model.state_dict().items()}
 
 
 class SimCSEDataset(Dataset):
@@ -158,39 +159,56 @@ class SimCSEDataset(Dataset):
         self.dir = dataset_dir / dataset_name
 
         if self.method == "unsup-simcse":
-            self.path = self.dir / "train.txt"
-            self.data: List[str] = self.path.read_text().splitlines()
-            self.data: List[str] = random.sample(self.data, num_train)
-
+            self.path, self.data = self.create_unsup_simcse_dataset()
         elif self.method == "sup-simcse":
-            if self.dataset_name == "janli":
-                self.path = self.dir / "janli.tsv"
-                df = pd.read_table(self.path)
-                df = df[df["entailment_label_Ja"] == "entailment"]
-                df = df[df["split"] == "train"]
-                premise = df["sentence_A_Ja"].tolist()
-                hypothesis = df["sentence_B_Ja"].tolist()
-                self.data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
-
-            elif self.dataset_name == "jnli":
-                self.path = self.dir / "train-v1.1.json"
-                df = pd.read_json(self.path, orient="records", lines=True)
-                df = df[df["label"] == "entailment"]
-                premise = df["sentence1"].tolist()
-                hypothesis = df["sentence2"].tolist()
-                self.data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
-
-            elif self.dataset_name == "jsnli":
-                self.path = self.dir / "train_w_filtering.tsv"
-                df = pd.read_table(self.path, header=None, names=["label", "premise", "hypothesis"])
-                df = df[df["label"] == "entailment"]
-                premise = [s.replace(" ", "") for s in df["premise"].tolist()]
-                hypothesis = [s.replace(" ", "") for s in df["hypothesis"].tolist()]
-                self.data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
-            else:
-                raise ValueError(f"Unknown dataset: {self.dataset_name}")
+            self.path, self.data = self.create_sup_simcse_dataset(self.dataset_name)
         else:
             raise ValueError(f"Unknown method: {self.method}")
+
+    def create_unsup_simcse_dataset(self) -> Tuple[Path, List[str]]:
+        path = self.dir / "train.txt"
+        data: List[str] = path.read_text().splitlines()
+        data: List[str] = random.sample(data, self.num_train)
+        return path, data
+
+    def create_sup_simcse_dataset(self, dataset_name: str) -> Tuple[Path, List[Tuple[str, str]]]:
+        if dataset_name == "janli":
+            path, data = self.create_sup_simcse_janli_dataset()
+        elif dataset_name == "jnli":
+            path, data = self.create_sup_simcse_jnli_dataset()
+        elif dataset_name == "jsnli":
+            path, data = self.create_sup_simcse_jsnli_dataset()
+        else:
+            raise ValueError(f"Unknown dataset: {self.dataset_name}")
+        return path, data
+
+    def create_sup_simcse_janli_dataset(self) -> Tuple[Path, List[Tuple[str, str]]]:
+        path = self.dir / "janli.tsv"
+        df = pd.read_table(path)
+        df = df[df["entailment_label_Ja"] == "entailment"]
+        df = df[df["split"] == "train"]
+        premise = df["sentence_A_Ja"].tolist()
+        hypothesis = df["sentence_B_Ja"].tolist()
+        data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
+        return path, data
+
+    def create_sup_simcse_jnli_dataset(self) -> Tuple[Path, List[Tuple[str, str]]]:
+        path = self.dir / "train-v1.1.json"
+        df = utils.load_jsonl(path)
+        df = df[df["label"] == "entailment"]
+        premise = df["sentence1"].tolist()
+        hypothesis = df["sentence2"].tolist()
+        data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
+        return path, data
+
+    def create_sup_simcse_jsnli_dataset(self) -> Tuple[Path, List[Tuple[str, str]]]:
+        path = self.dir / "train_w_filtering.tsv"
+        df = pd.read_table(path, header=None, names=["label", "premise", "hypothesis"])
+        df = df[df["label"] == "entailment"]
+        premise = [s.replace(" ", "") for s in df["premise"].tolist()]
+        hypothesis = [s.replace(" ", "") for s in df["hypothesis"].tolist()]
+        data: List[Tuple[str, str]] = list(zip(premise, hypothesis))
+        return path, data
 
     def __getitem__(self, index: int):
         return self.data[index]
@@ -224,17 +242,8 @@ class SimCSEModel(nn.Module):
         return emb
 
 
-def set_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-
 def main(args: Args):
-    logging.set_verbosity_error()
-    set_seed(args.seed)
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    utils.set_seed(args.seed)
 
     tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(args.model_name)
     model: SimCSEModel = SimCSEModel(args.model_name).eval().to(args.device)
@@ -265,7 +274,7 @@ def main(args: Args):
 
     if args.method == "unsup-simcse":
 
-        def train_step(batch: BatchEncoding) -> float:
+        def train_step(batch: BatchEncoding) -> torch.FloatTensor:
             emb1 = model.forward(**batch)
             emb2 = model.forward(**batch)
 
@@ -277,7 +286,7 @@ def main(args: Args):
 
     elif args.method == "sup-simcse":
 
-        def train_step(batch: BatchEncoding) -> float:
+        def train_step(batch: BatchEncoding) -> torch.FloatTensor:
             pre = model.forward(**batch.premise)
             hyp = model.forward(**batch.hypothesis)
 
@@ -290,11 +299,9 @@ def main(args: Args):
     else:
         raise ValueError(f"Unknown method: {args.method}")
 
-    scaler = torch.cuda.amp.GradScaler(enabled=not args.not_amp)
-
     best_stsb = exp.sts_dev()
     best_epoch, best_step = 0, 0
-    best_state_dict = model.state_dict()
+    best_state_dict = exp.clone_state_dict()
 
     print(f"epoch: {0:>3} |\tstep: {0:>6} |\tloss: {' '*9}nan |\tJSICK train: {best_stsb:.4f}")
     logs: List[Dict[str, Union[int, float]]] = [
@@ -306,6 +313,7 @@ def main(args: Args):
         }
     ]
 
+    scaler = torch.cuda.amp.GradScaler(enabled=not args.not_amp)
     for epoch in range(args.epochs):
         model.train()
 
@@ -317,12 +325,13 @@ def main(args: Args):
         ):
             with torch.cuda.amp.autocast(enabled=not args.not_amp):
                 batch: BatchEncoding = batch.to(args.device)
-                loss = train_step(batch)
+                loss: torch.FloatTensor = train_step(batch)
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
             scaler.step(optimizer)
 
+            # to avoid warnings
             scale = scaler.get_scale()
             scaler.update()
             if scale <= scaler.get_scale():
@@ -338,7 +347,7 @@ def main(args: Args):
                 if best_stsb < stsb_score:
                     best_stsb = stsb_score
                     best_epoch, best_step = epoch, total_steps
-                    best_state_dict = {k: v.detach().clone() for k, v in model.state_dict().items()}
+                    best_state_dict = exp.clone_state_dict()
 
                 tqdm.write(
                     f"epoch: {epoch:>3} |\tstep: {step+1:>6} |\tloss: {loss.item():.10f} |\tJSICK train: {stsb_score:.4f}"
@@ -354,24 +363,19 @@ def main(args: Args):
                 pd.DataFrame(logs).to_csv(args.output_dir / "logs.csv", index=False)
                 model.train()
 
-    with (args.output_dir / "dev-metrics.json").open("w") as f:
-        data = {
-            "best-epoch": best_epoch,
-            "best-step": best_step,
-            "best-stsb": best_stsb,
-        }
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    dev_metrics = {
+        "best-epoch": best_epoch,
+        "best-step": best_step,
+        "best-stsb": best_stsb,
+    }
+    utils.save_json(dev_metrics, args.output_dir / "dev-metrics.json")
 
     model.load_state_dict(best_state_dict)
     model.eval().to(args.device)
 
     sts_metrics = exp.sts_test()
-    with (args.output_dir / "sts-metrics.json").open("w") as f:
-        json.dump(sts_metrics, f, indent=2, ensure_ascii=False)
-
-    with (args.output_dir / "config.json").open("w") as f:
-        data = {k: v if type(v) in [int, float] else str(v) for k, v in vars(args).items()}
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    utils.save_json(sts_metrics, args.output_dir / "sts-metrics.json")
+    utils.save_config(args, args.output_dir / "config.json")
 
     # metb = MTEB(task_langs=["ja"])
     # metb.run(exp, output_folder=args.output_dir / "mteb")

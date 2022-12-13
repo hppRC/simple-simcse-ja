@@ -12,11 +12,10 @@ function jglue() {
     rm -rf ./JGLUE
 }
 
-function janli(){
+function janli() {
     git clone git@github.com:verypluming/JaNLI.git
     mv ./JaNLI ./datasets/janli
 }
-
 
 function jsnli() {
     wget "https://nlp.ist.i.kyoto-u.ac.jp/nl-resource/JSNLI/jsnli_1.1.zip"
@@ -25,9 +24,8 @@ function jsnli() {
     mv ./jsnli_1.1 ./datasets/jsnli
 }
 
-
 for func in jsick jglue janli jsnli; do
-    $func > /dev/null 2>&1 &
+    $func >/dev/null 2>&1 &
 done
 
 wait
