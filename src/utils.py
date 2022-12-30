@@ -6,17 +6,12 @@ from typing import Any, Dict, Iterable, List, Union
 import numpy as np
 import pandas as pd
 import torch
+import tqdm as _tqdm
 
 
-def set_seed(seed: int):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-
-def save_jsonl(data: Union[Iterable, pd.DataFrame], path: Union[Path, str]) -> None:
+def save_jsonl(data: Iterable | pd.DataFrame, path: Path | str) -> None:
     path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
     if type(data) != pd.DataFrame:
         data = pd.DataFrame(data)
@@ -28,35 +23,130 @@ def save_jsonl(data: Union[Iterable, pd.DataFrame], path: Union[Path, str]) -> N
     )
 
 
-def save_json(data: Dict[Any, Any], path: Union[Path, str]) -> None:
+def save_json(data: Dict[Any, Any], path: Path | str) -> None:
     path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     with path.open("w") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def load_jsonl(
-    path: Union[Path, str],
-    as_pd: bool = False,
-) -> Union[pd.DataFrame, List[Dict]]:
+def load_jsonl(path: Path | str) -> pd.DataFrame:
     path = Path(path)
-    df = pd.read_json(path, lines=True)
-    if as_pd:
-        return df
-    else:
-        return df.to_dict(orient="records")
+    return pd.read_json(path, lines=True)
 
 
-def load_json(path: Union[Path, str]) -> Dict:
+def load_json(path: Path | str) -> Dict:
     path = Path(path)
     with path.open() as f:
         data = json.load(f)
     return data
 
 
-def save_config(data, path: Union[Path, str]) -> None:
+def log(data: Dict, path: Path | str):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if path.exists():
+        df: pd.DataFrame = pd.read_csv(path)
+        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
+        df.to_csv(path, index=False)
+    else:
+        pd.DataFrame([data]).to_csv(path, index=False)
+
+
+def save_config(data, path: Path | str) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     if type(data) != dict:
         data = vars(data)
+
     save_json(
         {k: v if type(v) in [int, float, bool, None] else str(v) for k, v in data.items()},
         path,
     )
+
+
+def set_seed(seed: int = None) -> None:
+    if seed is None:
+        return
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+
+def dict_average(dicts: Iterable[Dict]) -> Dict:
+    dicts: List[Dict] = list(dicts)
+    averaged = {}
+
+    for k, v in dicts[0].items():
+        try:
+            v = v.item()
+        except:
+            pass
+        if type(v) in [int, float]:
+            averaged[k] = v / len(dicts)
+        else:
+            averaged[k] = [v]
+
+    for d in dicts[1:]:
+        for k, v in d.items():
+            try:
+                v = v.item()
+            except:
+                pass
+            if type(v) in [int, float]:
+                averaged[k] += v / len(dicts)
+            else:
+                averaged[k].append(v)
+
+    return averaged
+
+
+def tqdm(n: Iterable, total: int = None, position: int = None):
+    return _tqdm.tqdm(
+        n,
+        total=total or len(n),
+        leave=False,
+        dynamic_ncols=True,
+        position=position,
+    )
+
+
+def trange(n: int, position: int = None):
+    return _tqdm.trange(
+        n,
+        leave=False,
+        dynamic_ncols=True,
+        position=position,
+    )
+
+
+class ProgressBar:
+    def __init__(self, n: int, position: int = None):
+        self.n = n
+        self.position = position
+
+    def __enter__(self):
+        self.pbar = _tqdm.tqdm(
+            total=self.n,
+            position=self.position,
+            leave=False,
+            dynamic_ncols=True,
+        )
+        return self.pbar.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.pbar.__exit__(exc_type, exc_value, traceback)
+
+
+def torch_dtype(dtype: str) -> torch.dtype:
+    if dtype == "bf16":
+        return torch.bfloat16
+    elif dtype == "fp16":
+        return torch.float16
+    else:
+        return torch.float32

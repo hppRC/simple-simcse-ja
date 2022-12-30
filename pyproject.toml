@@ -7,27 +7,24 @@ readme = "README.md"
 packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
-python = "3.9.x"
-torch = { url = "https://download.pytorch.org/whl/cu113/torch-1.12.1%2Bcu113-cp39-cp39-linux_x86_64.whl" }
+python = "3.10.x"
+torch = { url = "https://download.pytorch.org/whl/cu116/torch-1.13.0%2Bcu116-cp310-cp310-linux_x86_64.whl" }
+tqdm = "^4.64.1"
+numpy = "<1.23.0"
+pandas = "^1.5.2"
 transformers = { extras = ["ja"], version = "^4.25.1" }
 tokenizers = "^0.13.2"
-datasets = "^2.6.1"
+datasets = "^2.8.0"
+sentencepiece = "^0.1.97"
 classopt = "^0.1.9"
+more-itertools = "^9.0.0"
 tensorflow = "^2.10.0"
 tensorflow-cpu = "^2.10.0"
-swig = "^4.1.0"
-mecab-python3 = "^1.0.5"
-pyknp = "^0.6.1"
-fugashi = "^1.2.0"
-unidic-lite = "^1.0.8"
-tqdm = "^4.64.1"
-pandas = "^1.5.1"
-mteb = "^1.0.0"
-more-itertools = "^9.0.0"
-scipy = "^1.9.3"
-scikit-learn = "^1.1.3"
 apache-beam = { extras = ["gcp"], version = "^2.42.0" }
-ipadic = "^1.0.0"
+scikit-learn = "^1.2.0"
+scipy = "<1.9.0"
+optuna = "^3.0.5"
+mteb = "^1.0.0"
 
 
 [build-system]

@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import Callable, Dict, List, Union
+from typing import Callable
 
-import pandas as pd
 import torch
 from scipy.stats import spearmanr
 from sklearn.metrics.pairwise import paired_cosine_distances
-from torch import Tensor
-from tqdm import tqdm
+from torch import FloatTensor
+
+from src import utils
 
 # TODO: さまざまな距離関数による評価
 
@@ -14,22 +14,22 @@ from tqdm import tqdm
 class STSEvaluatorBase:
     def __init__(
         self,
-        sentences1: List[str],
-        sentences2: List[str],
-        scores: List[float],
+        sentences1: list[str],
+        sentences2: list[str],
+        scores: list[float],
     ):
         self.sentences1 = sentences1
         self.sentences2 = sentences2
         self.scores = scores
         assert len(self.sentences1) == len(self.sentences2) == len(self.scores)
 
-    def __call__(self, encode: Callable[[List[str]], Tensor]) -> float:
+    def __call__(self, encode: Callable[[list[str]], FloatTensor]) -> float:
         embeddings1 = encode(self.sentences1)
         embeddings2 = encode(self.sentences2)
         # you can use any similarity function you want ↓
         cosine_scores = 1 - paired_cosine_distances(embeddings1, embeddings2)
-        spearman = float(spearmanr(self.scores, cosine_scores)[0]) * 100
-
+        spearman, _ = spearmanr(self.scores, cosine_scores)
+        spearman = float(spearman) * 100
         return spearman
 
 
@@ -39,24 +39,14 @@ class JSICKEvaluator(STSEvaluatorBase):
     # GitHub: https://github.com/verypluming/JSICK
 
     def __init__(self, sts_dir: Path):
-        df = pd.read_table(sts_dir / "jsick/jsick/jsick.tsv", sep="\t")
-        df = df[df["data"] == "test"]
-        sentences1 = df["sentence_A_Ja"].values
-        sentences2 = df["sentence_B_Ja"].values
-        scores = df["relatedness_score_Ja"].values
-
-        super().__init__(sentences1, sentences2, scores)
+        df = utils.load_jsonl(sts_dir / "jsick/test.jsonl")
+        super().__init__(df["sent0"], df["sent1"], df["score"])
 
 
 class JSICKTrainEvaluator(STSEvaluatorBase):
     def __init__(self, sts_dir: Path):
-        df = pd.read_table(sts_dir / "jsick/jsick/jsick.tsv", sep="\t")
-        df = df[df["data"] == "train"]
-        sentences1 = df["sentence_A_Ja"].values
-        sentences2 = df["sentence_B_Ja"].values
-        scores = df["relatedness_score_Ja"].values
-
-        super().__init__(sentences1, sentences2, scores)
+        df = utils.load_jsonl(sts_dir / "jsick/train.jsonl")
+        super().__init__(df["sent0"], df["sent1"], df["score"])
 
 
 class JSTSValidEvaluator(STSEvaluatorBase):
@@ -67,26 +57,18 @@ class JSTSValidEvaluator(STSEvaluatorBase):
     # GitHub: https://github.com/yahoojapan/JGLUE
 
     def __init__(self, sts_dir: Path):
-        df = pd.read_json(sts_dir / "jsts/valid-v1.1.json", lines=True)
-        sentences1 = df["sentence1"].values
-        sentences2 = df["sentence2"].values
-        scores = df["label"].values
-
-        super().__init__(sentences1, sentences2, scores)
+        df = utils.load_jsonl(sts_dir / "jsts/val.jsonl")
+        super().__init__(df["sent0"], df["sent1"], df["score"])
 
 
 class JSTSTrainEvaluator(STSEvaluatorBase):
     def __init__(self, sts_dir: Path):
-        df = pd.read_json(sts_dir / "jsts/train-v1.1.json", lines=True)
-        sentences1 = df["sentence1"].values
-        sentences2 = df["sentence2"].values
-        scores = df["label"].values
-
-        super().__init__(sentences1, sentences2, scores)
+        df = utils.load_jsonl(sts_dir / "jsts/train.jsonl")
+        super().__init__(df["sent0"], df["sent1"], df["score"])
 
 
 class STSEvaluation:
-    def __init__(self, sts_dir: Union[str, Path]):
+    def __init__(self, sts_dir: str | Path):
         sts_dir = Path(sts_dir)
         self.sts_evaluators = {
             "jsick": JSICKEvaluator(sts_dir=sts_dir),
@@ -98,16 +80,12 @@ class STSEvaluation:
     @torch.inference_mode()
     def __call__(
         self,
-        encode: Callable[[List[str]], Tensor],
+        encode: Callable[[list[str]], FloatTensor],
         progress_bar: bool = True,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
 
         if progress_bar:
-            iterator = tqdm(
-                list(self.sts_evaluators.items()),
-                dynamic_ncols=True,
-                leave=False,
-            )
+            iterator = utils.tqdm(list(self.sts_evaluators.items()))
         else:
             iterator = list(self.sts_evaluators.items())
 
@@ -121,6 +99,6 @@ class STSEvaluation:
     @torch.inference_mode()
     def dev(
         self,
-        encode: Callable[[List[str]], Tensor],
+        encode: Callable[[list[str]], FloatTensor],
     ) -> float:
         return self.dev_evaluator(encode=encode)
