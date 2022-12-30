@@ -16,7 +16,6 @@ transformers = { extras = ["ja"], version = "^4.25.1" }
 tokenizers = "^0.13.2"
 datasets = "^2.8.0"
 sentencepiece = "^0.1.97"
-classopt = "^0.1.9"
 more-itertools = "^9.0.0"
 tensorflow = "^2.10.0"
 tensorflow-cpu = "^2.10.0"
@@ -25,6 +24,12 @@ scikit-learn = "^1.2.0"
 scipy = "<1.9.0"
 optuna = "^3.0.5"
 mteb = "^1.0.0"
+ipykernel = "^6.19.4"
+ipywidgets = "^8.0.4"
+jupyterlab = "^3.5.2"
+matplotlib = "^3.6.2"
+plotly = "^5.11.0"
+classopt = "^0.2.0"
 
 
 [build-system]

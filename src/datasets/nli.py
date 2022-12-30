@@ -177,7 +177,7 @@ def jsnli_val(data_dir: Path, save_dir: Path):
         examples[identifier][label].add(hypothesis)
 
     data = []
-    for identifier, example_dict in examples.items():
+    for example_dict in examples.values():
         sent0: list[str] = list(example_dict["premise"])
         sent1: list[str] = list(example_dict["entailment"])
         hard_neg: list[str] = list(example_dict["contradiction"])
@@ -189,6 +189,29 @@ def jsnli_val(data_dir: Path, save_dir: Path):
 
     utils.save_jsonl(data, save_dir / "jsnli/val.jsonl")
     return data
+
+
+def create_all(data, save_dir: Path):
+    examples = defaultdict(lambda: defaultdict(set))
+
+    for example in data:
+        identifier = normalize(example["sent0"][0])
+        examples[identifier]["sent0"] |= set(example["sent0"])
+        examples[identifier]["sent1"] |= set(example["sent1"])
+        examples[identifier]["hard_neg"] |= set(example["hard_neg"])
+
+    data = []
+    for example_dict in examples.values():
+        sent0: list[str] = list(example_dict["sent0"])
+        sent1: list[str] = list(example_dict["sent1"])
+        hard_neg: list[str] = list(example_dict["hard_neg"])
+        if len(sent0) == 0 or len(sent1) == 0:
+            continue
+        data.append({"sent0": sent0, "sent1": sent1, "hard_neg": hard_neg})
+    random.shuffle(data)
+    data = [{"id": idx, **example} for idx, example in enumerate(data)]
+
+    utils.save_jsonl(data, save_dir / "all/train.jsonl")
 
 
 def main(args: Args):
@@ -205,7 +228,7 @@ def main(args: Args):
     train_all += jsnli_train(args.data_dir, args.save_dir)
     jsnli_val(args.data_dir, args.save_dir)
 
-
+    create_all(train_all, args.save_dir)
 
 
 if __name__ == "__main__":

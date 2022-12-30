@@ -144,9 +144,10 @@ class ProgressBar:
 
 
 def torch_dtype(dtype: str) -> torch.dtype:
-    if dtype == "bf16":
-        return torch.bfloat16
-    elif dtype == "fp16":
-        return torch.float16
-    else:
-        return torch.float32
+    match dtype.lower():
+        case "bf16":
+            return torch.bfloat16
+        case "fp16":
+            return torch.float16
+        case _:
+            return torch.float32
