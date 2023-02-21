@@ -28,16 +28,18 @@ class Args:
     dataset_name: str = "jsnli"
     sts_dir: Path = "./datasets/sts"
 
-    batch_size: int = 512
-    num_training_examples: int = 2**18
-    num_eval_logging: int = 16
+    batch_size: int = 256
+    num_training_examples: int = 2**20
+    num_train_only_mlp_steps: int = 0
+    # num_train_only_mlp_steps: int = 2**10
+    num_eval_logging: int = 2**6
     lr: float = 1e-5
     num_warmup_ratio: float = 0.1
 
     mlp_type: str = "simcse"
     temperature: float = 0.05
     mlp_only_train: bool = True
-    max_seq_len: int = 128
+    max_seq_len: int = 64
 
     not_amp: bool = False
     device: str = "cuda:0"
@@ -119,7 +121,7 @@ class Experiment:
             collate_fn=collate_fn,
             batch_size=batch_size or self.args.batch_size,
             shuffle=shuffle,
-            num_workers=4,
+            num_workers=8,
             pin_memory=True,
             drop_last=drop_last,
         )
@@ -192,6 +194,10 @@ def main(args: Args) -> float:
 
     scaler = torch.cuda.amp.GradScaler(enabled=not args.not_amp)
 
+    if args.num_train_only_mlp_steps > 0:
+        for param in exp.model.backbone.parameters():
+            param.requires_grad = False
+
     with utils.ProgressBar(n=args.num_training_steps) as pbar:
         current_step = 0
 
@@ -258,6 +264,9 @@ def main(args: Args) -> float:
                 pbar.update()
                 if current_step == args.num_training_steps:
                     break
+                if current_step >= args.num_train_only_mlp_steps:
+                    for param in exp.model.backbone.parameters():
+                        param.requires_grad = True
 
             if current_step == args.num_training_steps:
                 break

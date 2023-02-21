@@ -12,6 +12,10 @@ class Opt:
     method: str = "sup-simcse"
     model_name: str = "studio-ousia/luke-japanese-base-lite"
     mlp_type: str = "simcse"
+    dataset_dir: Path = "./datasets/nli"
+    dataset_name: str = "jsnli"
+
+    max_batch_size: int = 512
 
     n_trials: int = None
     timeout: int = None
@@ -21,8 +25,11 @@ class Opt:
     device: str = "cuda:0"
 
     def __post_init__(self):
+        if self.n_trials is None and self.timeout is None:
+            self.n_trials = 1
+
         model_name = self.model_name.replace("/", "__")
-        self.study_name = f"{self.method}/{model_name}/{self.mlp_type}"
+        self.study_name = f"{self.method}/{self.dataset_name}/{model_name}/{self.mlp_type}"
 
         self.output_dir = Path(f"outputs/optuna/{self.study_name}")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -35,20 +42,16 @@ class Objective:
         self.opt = opt
 
     def __call__(self, trial: Trial):
-        batch_size = trial.suggest_int("batch_size", 32, 512, log=True)
+        batch_size = trial.suggest_int("batch_size", 32, self.opt.max_batch_size, log=True)
         lr = trial.suggest_float("lr", 1e-6, 1e-4, log=True)
         temperature = trial.suggest_float("temperature", 1e-5, 1.0, log=True)
 
         args = Args.from_dict(
             {
+                **self.opt.to_dict(),
                 "batch_size": batch_size,
                 "lr": lr,
                 "temperature": temperature,
-                "model_name": self.opt.model_name,
-                "mlp_type": self.opt.mlp_type,
-                "seed": self.opt.seed,
-                "device": self.opt.device,
-                "dtype": self.opt.dtype,
             }
         )
         print(batch_size, lr, temperature)

@@ -13,6 +13,35 @@ files = [
 ]
 
 [[package]]
+name = "accelerate"
+version = "0.15.0"
+description = "Accelerate"
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "accelerate-0.15.0-py3-none-any.whl", hash = "sha256:014833307424cd0a22f89815802e00653756257c45dfdba2453e52d428931c65"},
+    {file = "accelerate-0.15.0.tar.gz", hash = "sha256:438e25a01afa6e3ffbd25353e76a68be49677c3050f10bfac7beafaf53503efc"},
+]
+
+[package.dependencies]
+numpy = ">=1.17"
+packaging = ">=20.0"
+psutil = "*"
+pyyaml = "*"
+torch = ">=1.4.0"
+
+[package.extras]
+dev = ["black (>=22.0,<23.0)", "datasets", "deepspeed (<0.7.0)", "evaluate", "flake8 (>=3.8.3)", "hf-doc-builder (>=0.3.0)", "isort (>=5.5.4)", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "rich", "scikit-learn", "scipy", "tqdm", "transformers"]
+quality = ["black (>=22.0,<23.0)", "flake8 (>=3.8.3)", "hf-doc-builder (>=0.3.0)", "isort (>=5.5.4)"]
+rich = ["rich"]
+sagemaker = ["sagemaker"]
+test-dev = ["datasets", "deepspeed (<0.7.0)", "evaluate", "scikit-learn", "scipy", "tqdm", "transformers"]
+test-prod = ["parameterized", "pytest", "pytest-subtests", "pytest-xdist"]
+test-trackers = ["comet-ml", "tensorboard", "wandb"]
+testing = ["datasets", "deepspeed (<0.7.0)", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scikit-learn", "scipy", "tqdm", "transformers"]
+
+[[package]]
 name = "aiohttp"
 version = "3.8.3"
 description = "Async http client/server framework (asyncio)"
@@ -608,14 +637,14 @@ unicode-backport = ["unicodedata2"]
 
 [[package]]
 name = "classopt"
-version = "0.2.0"
+version = "0.2.1"
 description = "Arguments parser with class for Python, inspired by StructOpt"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "classopt-0.2.0-py3-none-any.whl", hash = "sha256:c68e58ca9273deb01a6a5a7cda5b915ff764afba1e2ea82a57299129dd24b9f3"},
-    {file = "classopt-0.2.0.tar.gz", hash = "sha256:178350ca6ea7aabade0b2722f0cfe243d708aa58d60b41b1cae9a0566d07ceba"},
+    {file = "classopt-0.2.1-py3-none-any.whl", hash = "sha256:26419443f3a8fee90e73bcff15f608998ae9ad754c61a8903c0713289826c2d4"},
+    {file = "classopt-0.2.1.tar.gz", hash = "sha256:6c540b8fa6ef409a97dfe90fede83b4feaa6384f1e53a2fb241ca986d6137a32"},
 ]
 
 [[package]]
@@ -963,6 +992,21 @@ files = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
 ]
+
+[[package]]
+name = "deepl"
+version = "1.11.0"
+description = "Python library for the DeepL API."
+category = "main"
+optional = false
+python-versions = ">=3.6.2,<4"
+files = [
+    {file = "deepl-1.11.0-py3-none-any.whl", hash = "sha256:63a68caebedc4ba55ba999758993f3df54ea5e67f060a7b3b471a52dc56d70e7"},
+    {file = "deepl-1.11.0.tar.gz", hash = "sha256:ef1dd3e662913734d10acc7c1b8fa5d4fd76d7cda5297be692511a0d12c58ee1"},
+]
+
+[package.dependencies]
+requests = ">=2,<3"
 
 [[package]]
 name = "defusedxml"
@@ -6032,4 +6076,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.x"
-content-hash = "0609fadc6d8b76d8b30ffe67117e1900c57d9adbf3bb20d125c544807d1d9dc2"
+content-hash = "7e6b2c25822aea499afbae375415322bea269cc630dacd31def1c9be12e2bde2"

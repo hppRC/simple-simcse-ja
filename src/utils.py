@@ -1,7 +1,7 @@
 import json
 import random
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -23,7 +23,7 @@ def save_jsonl(data: Iterable | pd.DataFrame, path: Path | str) -> None:
     )
 
 
-def save_json(data: Dict[Any, Any], path: Path | str) -> None:
+def save_json(data: dict[Any, Any], path: Path | str) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -36,14 +36,14 @@ def load_jsonl(path: Path | str) -> pd.DataFrame:
     return pd.read_json(path, lines=True)
 
 
-def load_json(path: Path | str) -> Dict:
+def load_json(path: Path | str) -> dict:
     path = Path(path)
     with path.open() as f:
         data = json.load(f)
     return data
 
 
-def log(data: Dict, path: Path | str):
+def log(data: dict, path: Path | str):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -78,8 +78,8 @@ def set_seed(seed: int = None) -> None:
     torch.cuda.manual_seed_all(seed)
 
 
-def dict_average(dicts: Iterable[Dict]) -> Dict:
-    dicts: List[Dict] = list(dicts)
+def dict_average(dicts: Iterable[dict]) -> dict:
+    dicts: list[dict] = list(dicts)
     averaged = {}
 
     for k, v in dicts[0].items():

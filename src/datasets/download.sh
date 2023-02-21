@@ -24,7 +24,21 @@ function jsnli() {
     mv ./jsnli_1.1 ./data/jsnli
 }
 
-for func in jsick jglue janli jsnli; do
+function snli() {
+    wget https://nlp.stanford.edu/projects/snli/snli_1.0.zip
+    unzip snli_1.0.zip -d snli
+    mv snli data/snli
+    rm snli_1.0.zip
+}
+
+function mnli() {
+    wget https://cims.nyu.edu/~sbowman/multinli/multinli_1.0.zip
+    unzip multinli_1.0.zip -d multinli
+    mv multinli data/mnli
+    rm multinli_1.0.zip
+}
+
+for func in jsick jglue janli jsnli snli mnli; do
     $func >/dev/null 2>&1 &
 done
 

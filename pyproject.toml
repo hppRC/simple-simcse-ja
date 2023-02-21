@@ -12,7 +12,7 @@ torch = { url = "https://download.pytorch.org/whl/cu116/torch-1.13.0%2Bcu116-cp3
 tqdm = "^4.64.1"
 numpy = "<1.23.0"
 pandas = "^1.5.2"
-transformers = { extras = ["ja"], version = "^4.25.1" }
+transformers = { extras = ["ja", "sentencepiece"], version = "^4.25.1" }
 tokenizers = "^0.13.2"
 datasets = "^2.8.0"
 sentencepiece = "^0.1.97"
@@ -30,6 +30,8 @@ jupyterlab = "^3.5.2"
 matplotlib = "^3.6.2"
 plotly = "^5.11.0"
 classopt = "^0.2.0"
+deepl = "^1.11.0"
+accelerate = "^0.15.0"
 
 
 [build-system]
