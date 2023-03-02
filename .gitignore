@@ -1,4 +1,6 @@
+!.envrc
 /outputs
+/data
 /datasets
 
 # Byte-compiled / optimized / DLL files
