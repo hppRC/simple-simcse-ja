@@ -8,7 +8,8 @@ class SimCSEModel(nn.Module):
     def __init__(
         self,
         model_name: str,
-        mlp_only_train: bool = False,
+        mlp_only_train: bool = True,
+        gradient_checkpointing: bool = False,
     ):
         super().__init__()
         self.mlp_only_train = mlp_only_train
@@ -16,6 +17,9 @@ class SimCSEModel(nn.Module):
             model_name,
             torch_dtype="auto",
         )
+
+        if gradient_checkpointing:
+            self.backbone.gradient_checkpointing_enable()
 
         hidden_size: int = self.backbone.config.hidden_size
         self.dense = nn.Linear(hidden_size, hidden_size)

@@ -19,7 +19,7 @@ class Args(CommonArgs):
     dataset_name: str = "jsnli"
 
     batch_size: int = 512
-    lr: float = 3e-5
+    lr: float = 1e-5
 
 
 def main(args: Args):

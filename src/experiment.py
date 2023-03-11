@@ -31,6 +31,7 @@ class CommonArgs(Tap):
     temperature: float = 0.05
     mlp_only_train: bool = True
     max_seq_len: int = 64
+    gradient_checkpointing: bool = False
 
     use_jumanpp: bool = False
 
@@ -85,6 +86,7 @@ class Experiment:
             SimCSEModel(
                 model_name=self.args.model_name,
                 mlp_only_train=self.args.mlp_only_train,
+                gradient_checkpointing=self.args.gradient_checkpointing,
             )
             .eval()
             .to(self.args.device)

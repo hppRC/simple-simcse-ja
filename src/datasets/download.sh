@@ -38,7 +38,15 @@ function mnli() {
     rm multinli_1.0.zip
 }
 
-for func in jsick jglue janli jsnli snli mnli; do
+# http://www.cl.ecei.tohoku.ac.jp/rite2/wiki_%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%97%E3%83%BC%E3%83%AB.html
+# https://www.anlp.jp/proceedings/annual_meeting/2008/pdf_dir/E5-4.pdf
+function ku_rte() {
+    wget -O "./ku-rte.txt" "http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/rte/entail_evaluation_set.txt&name=entail_evaluation_set.txt"
+    mkdir data/ku-rte
+    mv ./ku-rte.txt ./data/ku-rte/raw.txt
+}
+
+for func in jsick jglue janli jsnli snli mnli ku_rte; do
     $func >/dev/null 2>&1 &
 done
 
