@@ -41,6 +41,8 @@ def main(args: Args):
 
             # if not dataset_name in ["jsnli", "nu-snli"]:
             #     continue
+            # if not "large" in model_name:
+            #     continue
 
             with sts_metrics_path.open() as f:
                 sts_metrics = json.load(f)
@@ -66,11 +68,12 @@ def main(args: Args):
     hparams_columns = ["batch_size", "lr"]
     config_columns = setting_columns + hparams_columns
 
-    for method, data in data.items():
+    for method, df in data.items():
+        print(method, len(df))
         output_dir = args.output_dir / method
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        df = pd.DataFrame(data)
+        df = pd.DataFrame(df)
         df = df.sort_values(by=config_columns, ascending=False)
         counts: list[int] = list(df.groupby(config_columns).size())
 

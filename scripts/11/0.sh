@@ -1,30 +1,15 @@
 device="cuda:0"
 
-for i in 0 1 2; do
-    for model_name in studio-ousia/luke-japanese-large-lite studio-ousia/luke-japanese-base-lite; do
-        for batch_size in 512; do
-            for lr in 5e-5 3e-5 1e-5; do
+for model_name in nlp-waseda/roberta-large-japanese ku-nlp/deberta-v2-large-japanese; do
+    for lr in 1e-5 3e-5 5e-5; do
+        for batch_size in 64 128 256 512; do
+            for dataset_name in nu-snli nu-mnli nu-snli+mnli; do
                 poetry run python src/train_sup.py \
-                    --dataset_name jsnli \
+                    --dataset_name $dataset_name \
                     --model_name $model_name \
                     --batch_size $batch_size \
                     --lr $lr \
-                    --gradient_checkpointing \
-                    --device $device
-
-                poetry run python src/train_sup.py \
-                    --dataset_name nu-snli \
-                    --model_name $model_name \
-                    --batch_size $batch_size \
-                    --lr $lr \
-                    --gradient_checkpointing \
-                    --device $device
-
-                poetry run python src/train_sup.py \
-                    --dataset_name nu-snli+mnli \
-                    --model_name $model_name \
-                    --batch_size $batch_size \
-                    --lr $lr \
+                    --use_jumanpp \
                     --gradient_checkpointing \
                     --device $device
             done

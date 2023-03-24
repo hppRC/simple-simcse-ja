@@ -1,7 +1,7 @@
-device="cuda:0"
+device="cuda:3"
 
 for i in 0 1 2; do
-    for model_name in cl-tohoku/bert-base-japanese-v2 cl-tohoku/bert-base-japanese-char-v2; do
+    for model_name in microsoft/mdeberta-v3-base studio-ousia/mluke-base-lite; do
         for lr in 1e-5 3e-5 5e-5; do
             for batch_size in 512; do
                 poetry run python src/train_sup.py \
