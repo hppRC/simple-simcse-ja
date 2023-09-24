@@ -79,6 +79,24 @@ def save_config(data, path: Path | str) -> None:
     save_json(data, path)
 
 
+def save_csv(
+    df: Iterable | pd.DataFrame,
+    path: str | Path,
+    filter_column: str | list[str] = None,
+    filter_value: str | list[str] = None,
+) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if type(df) != pd.DataFrame:
+        df = pd.DataFrame(df)
+
+    if filter_column and filter_value:
+        df = df[df[filter_column] == filter_value]
+
+    df.to_csv(path, index=False)
+
+
 def set_seed(seed: int = None) -> None:
     if seed is None:
         return
@@ -141,6 +159,7 @@ def log(data: dict, path: Path | str) -> None:
 
 # to facilitate the caching mechanism of HuggingFace Datasets, we need to create the instance of Jumanpp as a global variable
 jumanpp = rhoknp.Jumanpp()
+
 
 # https://rekken.hatenablog.com/entry/20140402/1396364400
 # https://nlp.ist.i.kyoto-u.ac.jp/index.php?KNP%2FFAQ

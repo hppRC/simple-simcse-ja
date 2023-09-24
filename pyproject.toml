@@ -8,22 +8,22 @@ packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = "3.10.x"
-torch = { url = "https://download.pytorch.org/whl/cu116/torch-1.13.1%2Bcu116-cp310-cp310-linux_x86_64.whl" }
-tqdm = "^4.64.1"
-numpy = "<1.23.0"
-pandas = "^1.5.2"
-transformers = { extras = ["ja", "sentencepiece"], version = "^4.26.1" }
-datasets = { extras = ["tensorflow"], version = "^2.8.0" }
-tokenizers = "^0.13.2"
-accelerate = "^0.16.0"
-more-itertools = "^9.0.0"
-scikit-learn = "^1.2.0"
-classopt = "^0.2.1"
+torch = { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" }
+transformers = { extras = ["ja", "sentencepiece"], version = "^4.28.1" }
+typed-argument-parser = "^1.8.0"
+accelerate = "^0.18.0"
+tokenizers = "^0.13.3"
+datasets = { extras = ["tensorflow"], version = "^2.12.0" }
+tqdm = "^4.65.0"
+numpy = "^1.24.3"
+pandas = "^2.0.1"
+more-itertools = "^9.1.0"
+scikit-learn = "^1.2.2"
 konoha = "^5.0.0"
 mwparserfromhell = "^0.6.4"
 python-snappy = "^0.6.1"
-typed-argument-parser = "^1.7.2"
 mojimoji = "^0.0.12"
+peft = "^0.3.0"
 
 [build-system]
 requires = ["poetry-core"]

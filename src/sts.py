@@ -106,7 +106,6 @@ class STSEvaluation:
         encode: Callable[[list[str]], FloatTensor],
         progress_bar: bool = True,
     ) -> dict[str, float]:
-
         if progress_bar:
             iterator = tqdm(list(self.sts_evaluators.items()), dynamic_ncols=True, leave=False)
         else:

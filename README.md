@@ -8,6 +8,9 @@ poetry run pip install --upgrade --force-reinstall --no-deps "apache-beam[gcp]" 
 
 | base models                                                                                                               | batch size |  lr   | JSICK (val) | JSICK (test) | JSTS (train) | JSTS (val) |
 | ------------------------------------------------------------------------------------------------------------------------- | :--------: | :---: | :---------: | :----------: | :----------: | :--------: |
+| [cl-tohoku/bert-base-japanese-v3](https://huggingface.co/cl-tohoku/bert-base-japanese-v3)                                 |            |       |             |              |              |            |
+| [cl-tohoku/bert-base-japanese-char-v3](https://huggingface.co/cl-tohoku/bert-base-japanese-char-v3)                       |            |       |             |              |              |            |
+|                                                                                                                           |            |       |             |              |              |            |
 | [cl-tohoku/bert-base-japanese-v2](https://huggingface.co/cl-tohoku/bert-base-japanese-v2)                                 |            |       |             |              |              |            |
 | [cl-tohoku/bert-base-japanese-char-v2](https://huggingface.co/cl-tohoku/bert-base-japanese-char-v2)                       |            |       |             |              |              |            |
 | [cl-tohoku/bert-base-japanese](https://huggingface.co/cl-tohoku/bert-base-japanese)                                       |            |       |             |              |              |            |
@@ -22,13 +25,15 @@ poetry run pip install --upgrade --force-reinstall --no-deps "apache-beam[gcp]" 
 |                                                                                                                           |            |       |             |              |              |            |
 | [bert-base-multilingual-cased](https://huggingface.co/bert-base-multilingual-cased)                                       |            |       |             |              |              |            |
 | [xlm-roberta-base](https://huggingface.co/xlm-roberta-base)                                                               |            |       |             |              |              |            |
-| [microsoft/mdeberta-v3-base](https://huggingface.co/microsoft/mdeberta-v3-base)                                           |            |       |             |              |              |            |
 | [studio-ousia/mluke-base-lite](https://huggingface.co/studio-ousia/mluke-base-lite)                                       |            |       |             |              |              |            |
 
 
 
 | large models                                                                                            | batch size |  lr   | JSICK (val) | JSICK (test) | JSTS (train) | JSTS (val) |
 | ------------------------------------------------------------------------------------------------------- | :--------: | :---: | :---------: | :----------: | :----------: | :--------: |
+| [cl-tohoku/bert-large-japanese-v2](https://huggingface.co/cl-tohoku/bert-large-japanese-v2)             |            |       |             |              |              |            |
+| [cl-tohoku/bert-large-japanese-char-v2](https://huggingface.co/cl-tohoku/bert-large-japanese-char-v2)   |            |       |             |              |              |            |
+|                                                                                                         |            |       |             |              |              |            |
 | [cl-tohoku/bert-large-japanese](https://huggingface.co/cl-tohoku/bert-large-japanese)                   |            |       |             |              |              |            |
 | [ku-nlp/roberta-large-japanese-char-wwm](https://huggingface.co/ku-nlp/roberta-large-japanese-char-wwm) |            |       |             |              |              |            |
 | [studio-ousia/luke-japanese-large-lite](https://huggingface.co/studio-ousia/luke-japanese-large-lite)   |            |       |             |              |              |            |

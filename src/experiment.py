@@ -3,11 +3,12 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+import peft
 import torch
 from tap import Tap
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, PreTrainedModel
 from transformers.tokenization_utils import BatchEncoding, PreTrainedTokenizer
 
 import src.utils as utils
@@ -24,15 +25,17 @@ class CommonArgs(Tap):
     dataset_name: str
 
     sts_dir: Path = "./datasets/sts"
+    pooling: str = "cls"
 
-    batch_size: int
-    lr: float
+    batch_size: int = None
+    lr: float = None
 
     temperature: float = 0.05
     mlp_only_train: bool = True
     max_seq_len: int = 64
     gradient_checkpointing: bool = False
 
+    use_lora: bool = False
     use_jumanpp: bool = False
 
     num_training_examples: int = 2**20
@@ -57,9 +60,17 @@ class CommonArgs(Tap):
             date,
             time,
         )
-        self.num_training_steps: int = self.num_training_examples // self.batch_size
-        self.num_warmup_steps: int = int(self.num_training_steps * self.num_warmup_ratio)
-        self.eval_logging_interval: int = (self.num_training_steps - 1) // self.num_eval_logging + 1
+
+    def reset_output_dir(self):
+        date, time = datetime.now().strftime("%Y-%m-%d/%H-%M-%S").split("/")
+        self.output_dir = self.make_output_dir(
+            "outputs",
+            self.METHOD,
+            self.dataset_name,
+            self.model_name,
+            date,
+            time,
+        )
 
     def make_output_dir(self, *args) -> Path:
         args = [str(a).replace("/", "__") for a in args]
@@ -71,26 +82,55 @@ class CommonArgs(Tap):
     def data_dir(self) -> Path:
         return self.dataset_dir / self.dataset_name
 
+    @property
+    def num_training_steps(self) -> int:
+        return self.num_training_examples // self.batch_size
 
-@dataclass
+    @property
+    def num_warmup_steps(self) -> int:
+        return int(self.num_training_steps * self.num_warmup_ratio)
+
+    @property
+    def eval_logging_interval(self) -> int:
+        return (self.num_training_steps - 1) // self.num_eval_logging + 1
+
+
 class Experiment:
     args: CommonArgs
 
-    def __post_init__(self):
+    def __init__(self, args: CommonArgs, model: PreTrainedModel = None):
+        self.args = args
+
         self.tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(
             self.args.model_name,
             model_max_length=self.args.max_seq_len,
             use_fast=False,
         )
-        self.model: SimCSEModel = (
-            SimCSEModel(
-                model_name=self.args.model_name,
-                mlp_only_train=self.args.mlp_only_train,
-                gradient_checkpointing=self.args.gradient_checkpointing,
+
+        if model is None:
+            self.model: SimCSEModel = (
+                SimCSEModel(
+                    model_name=self.args.model_name,
+                    mlp_only_train=self.args.mlp_only_train,
+                    gradient_checkpointing=self.args.gradient_checkpointing,
+                    pooling=self.args.pooling,
+                )
+                .eval()
+                .to(self.args.device)
             )
-            .eval()
-            .to(self.args.device)
-        )
+        else:
+            self.model: SimCSEModel = (
+                SimCSEModel(
+                    backbone=model,
+                    mlp_only_train=self.args.mlp_only_train,
+                    gradient_checkpointing=self.args.gradient_checkpointing,
+                    pooling=self.args.pooling,
+                )
+                .eval()
+                .to(self.args.device)
+            )
+            if self.args.use_lora and self.args.gradient_checkpointing:
+                self.model.backbone.enable_input_require_grads()
 
         self.sts = STSEvaluation(
             sts_dir=self.args.sts_dir,
@@ -165,7 +205,10 @@ class Experiment:
         return self.sts(encode=self.encode)
 
     def clone_state_dict(self) -> dict:
-        return {k: v.detach().clone().cpu() for k, v in self.model.state_dict().items()}
+        if self.args.use_lora:
+            return peft.get_peft_model_state_dict(self.model.backbone)
+        else:
+            return {k: v.detach().clone().cpu() for k, v in self.model.state_dict().items()}
 
     def log(self, metrics: dict) -> None:
         utils.log(metrics, self.args.output_dir / "log.csv")
@@ -177,10 +220,9 @@ class Experiment:
         )
 
 
-@dataclass
 class UnsupSimCSEExperiment(Experiment):
-    def __post_init__(self):
-        super().__post_init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.train_dataset = UnsupSimCSEDataset(
             self.args.data_dir / "train.txt",
@@ -197,10 +239,9 @@ class UnsupSimCSEExperiment(Experiment):
         return self.tokenize(data_list)
 
 
-@dataclass
 class SupSimCSEExperiment(Experiment):
-    def __post_init__(self):
-        super().__post_init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.train_dataset = SupSimCSEDataset(
             self.args.data_dir / "train.jsonl",
