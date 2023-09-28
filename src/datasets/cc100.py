@@ -3,10 +3,9 @@ import random
 from pathlib import Path
 
 from classopt import classopt
-from more_itertools import flatten
-
 from datasets import DatasetDict, load_dataset
 from datasets.formatting.formatting import LazyBatch
+from more_itertools import flatten
 from src.datasets.common import preprocess_text
 
 

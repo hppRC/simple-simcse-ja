@@ -1,14 +1,13 @@
 from itertools import count
 from pathlib import Path
 
+import src.utils as utils
 import torch
 import torch.nn.functional as F
+from src.experiment import CommonArgs, SupSimCSEExperiment
 from tqdm import tqdm
 from transformers.optimization import get_linear_schedule_with_warmup
 from transformers.tokenization_utils import BatchEncoding
-
-import src.utils as utils
-from src.experiment import CommonArgs, SupSimCSEExperiment
 
 
 class Args(CommonArgs):
@@ -71,13 +70,21 @@ def main(args: Args):
                     sent1 = exp.model.forward(**batch.sent1)
                     hard_neg = exp.model.forward(**batch.hard_neg)
 
-                sim_mat_1st = F.cosine_similarity(sent0.unsqueeze(1), sent1.unsqueeze(0), dim=-1)
-                sim_mat_2nd = F.cosine_similarity(sent0.unsqueeze(1), hard_neg.unsqueeze(0), dim=-1)
+                sim_mat_1st = F.cosine_similarity(
+                    sent0.unsqueeze(1), sent1.unsqueeze(0), dim=-1
+                )
+                sim_mat_2nd = F.cosine_similarity(
+                    sent0.unsqueeze(1), hard_neg.unsqueeze(0), dim=-1
+                )
 
                 sim_mat = torch.cat([sim_mat_1st, sim_mat_2nd], dim=1)
                 sim_mat = sim_mat / args.temperature
 
-                labels = torch.arange(sim_mat.size(0)).long().to(args.device, non_blocking=True)
+                labels = (
+                    torch.arange(sim_mat.size(0))
+                    .long()
+                    .to(args.device, non_blocking=True)
+                )
                 loss = F.cross_entropy(sim_mat, labels)
                 train_losses.append(float(loss.item()))
 

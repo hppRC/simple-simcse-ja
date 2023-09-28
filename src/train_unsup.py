@@ -1,14 +1,13 @@
 from itertools import count
 from pathlib import Path
 
+import src.utils as utils
 import torch
 import torch.nn.functional as F
+from src.experiment import CommonArgs, UnsupSimCSEExperiment
 from tqdm import tqdm
 from transformers.optimization import get_linear_schedule_with_warmup
 from transformers.tokenization_utils import BatchEncoding
-
-import src.utils as utils
-from src.experiment import CommonArgs, UnsupSimCSEExperiment
 
 
 class Args(CommonArgs):
@@ -70,7 +69,9 @@ def main(args: Args):
                     emb1 = exp.model.forward(**batch)
                     emb2 = exp.model.forward(**batch)
 
-                sim_mat = F.cosine_similarity(emb1.unsqueeze(1), emb2.unsqueeze(0), dim=-1)
+                sim_mat = F.cosine_similarity(
+                    emb1.unsqueeze(1), emb2.unsqueeze(0), dim=-1
+                )
                 sim_mat = sim_mat / args.temperature
 
                 labels = torch.arange(sim_mat.size(0)).long().to(args.device)

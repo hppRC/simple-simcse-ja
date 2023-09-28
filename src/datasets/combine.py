@@ -2,9 +2,8 @@ import random
 import unicodedata
 from pathlib import Path
 
-from tap import Tap
-
 from src import utils
+from tap import Tap
 
 
 class Args(Tap):

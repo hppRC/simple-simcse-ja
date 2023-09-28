@@ -4,9 +4,8 @@ import re
 from pathlib import Path
 
 from classopt import classopt
-from more_itertools import flatten
-
 from datasets import DatasetDict, load_dataset
+from more_itertools import flatten
 from src.datasets.common import preprocess_text
 
 
@@ -55,7 +54,9 @@ def process(text: str, title: str = None):
 
 
 def batch_process(batch):
-    examples = [process(text, title) for text, title in zip(batch["text"], batch["title"])]
+    examples = [
+        process(text, title) for text, title in zip(batch["text"], batch["title"])
+    ]
     return {
         "title": [e["title"] for e in examples],
         "sentences": [e["sentences"] for e in examples],

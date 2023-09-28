@@ -1,11 +1,10 @@
 import random
 from pathlib import Path
 
-from torch.utils.data import Dataset as TorchDataset
-
 from datasets import Dataset as HFDataset
 from datasets import load_dataset
 from src import utils
+from torch.utils.data import Dataset as TorchDataset
 
 
 def jumanpp_unsup_process(example: dict) -> dict:

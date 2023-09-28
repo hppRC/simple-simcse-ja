@@ -86,9 +86,42 @@ dataset: jsnli, wiki40b
 | [xlm-roberta-large](https://huggingface.co/xlm-roberta-large)                                           |    81.50    |    80.80     |    74.66     |   79.09    |   78.18   |
 | [studio-ousia/mluke-large-lite](https://huggingface.co/studio-ousia/mluke-large-lite)                   |    80.38    |    79.44     |    73.11     |   77.66    |   76.74   |
 
+
+### Rank
+
+データセットごとにモデルの順位をつけ、その平均を計算しました。
+
+| Model                                           | Supervised | Unsupervised |
+| ----------------------------------------------- | ---------: | -----------: |
+| nlp-waseda/roberta-large-japanese               |       1.20 |         1.00 |
+| cl-tohoku/bert-large-japanese-v2                |       2.20 |         4.25 |
+| studio-ousia/luke-japanese-large-lite           |       2.80 |         3.50 |
+| cl-tohoku/bert-base-japanese-v3                 |       6.40 |         4.50 |
+| studio-ousia/mluke-large-lite                   |       6.60 |         8.00 |
+| cl-tohoku/bert-base-japanese-v2                 |       6.80 |        10.25 |
+| cl-tohoku/bert-large-japanese-char-v2           |       7.00 |         5.00 |
+| ku-nlp/roberta-large-japanese-char-wwm          |       8.00 |        15.25 |
+| cl-tohoku/bert-large-japanese                   |       9.00 |        10.50 |
+| studio-ousia/luke-japanese-base-lite            |      10.00 |         7.00 |
+| xlm-roberta-large                               |      11.80 |         5.00 |
+| nlp-waseda/roberta-base-japanese                |      12.80 |         8.50 |
+| ku-nlp/deberta-v2-large-japanese                |      13.20 |        13.25 |
+| cl-tohoku/bert-base-japanese-whole-word-masking |      13.80 |        16.75 |
+| studio-ousia/mluke-base-lite                    |      15.00 |        17.00 |
+| ku-nlp/deberta-v2-base-japanese                 |      15.40 |        15.75 |
+| cl-tohoku/bert-base-japanese                    |      16.40 |        18.00 |
+| ku-nlp/roberta-base-japanese-char-wwm           |      16.60 |        22.25 |
+| cl-tohoku/bert-base-japanese-char-v3            |      17.40 |        12.75 |
+| cl-tohoku/bert-base-japanese-char-v2            |      19.60 |        15.25 |
+| bert-base-multilingual-cased                    |      20.60 |        20.75 |
+| cl-tohoku/bert-base-japanese-char               |      22.00 |        19.50 |
+| xlm-roberta-base                                |      22.60 |        22.00 |
+| megagonlabs/roberta-long-japanese               |      22.80 |        24.00 |
+
+
 ## Dataset
 
-### sup-simcse
+### Supervised SimCSE
 
 | Dataset      | JSICK (val) | JSICK (test) | JSTS (train) | JSTS (val) |   Avg.    |
 | ------------ | :---------: | :----------: | :----------: | :--------: | :-------: |
@@ -97,7 +130,20 @@ dataset: jsnli, wiki40b
 | NU-SNLI+MNLI |    82.44    |    81.87     |    79.59     |   82.81    |   81.43   |
 | JaNLI        |    81.10    |    80.92     |    73.41     |   77.98    |   77.44   |
 | NU-MNLI      |    75.65    |    75.39     |    81.13     |   83.53    |   80.02   |
-### unsup-simcse
+
+
+| Dataset      | Supervised |
+| ------------ | ---------: |
+| JSNLI        |      1.583 |
+| NU-SNLI+MNLI |      2.000 |
+| NU-SNLI      |      2.417 |
+| NU-MNLI      |      4.375 |
+| JaNLI        |      4.625 |
+
+
+### Unsupervised SimCSE
+
+#### データセットごとの性能
 
 | Dataset   | JSICK (val) | JSICK (test) | JSTS (train) | JSTS (val) |   Avg.    |
 | --------- | :---------: | :----------: | :----------: | :--------: | :-------: |
@@ -105,3 +151,14 @@ dataset: jsnli, wiki40b
 | BCCWJ     |    79.60    |    79.45     |    76.71     |   80.83    |   79.00   |
 | Wiki40b   |    79.54    |    79.14     |    77.18     |   81.00    | **79.11** |
 | CC100     |    76.26    |    76.27     |    71.39     |   75.91    |   74.52   |
+
+#### データセットごとの平均順位
+
+モデルごとにデータセットの順位をつけ、その平均を計算しました。
+
+| Dataset   | Supervised |
+| --------- | ---------: |
+| Wikipedia |      1.875 |
+| BCCWJ     |      2.083 |
+| Wiki40b   |      2.208 |
+| CC100     |      3.833 |

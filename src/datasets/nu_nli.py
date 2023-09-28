@@ -2,9 +2,8 @@ import random
 import unicodedata
 from pathlib import Path
 
-from tap import Tap
-
 from src import utils
+from tap import Tap
 
 
 class Args(Tap):
@@ -33,8 +32,16 @@ def main(args: Args):
             data = []
             for _, group in df.groupby("group_id"):
                 sent0 = group["premise"].unique().tolist()
-                sent1 = group[group["label"] == "entailment"]["hypothesis"].unique().tolist()
-                hard_neg = group[group["label"] == "contradiction"]["hypothesis"].unique().tolist()
+                sent1 = (
+                    group[group["label"] == "entailment"]["hypothesis"]
+                    .unique()
+                    .tolist()
+                )
+                hard_neg = (
+                    group[group["label"] == "contradiction"]["hypothesis"]
+                    .unique()
+                    .tolist()
+                )
 
                 if len(sent0) == 0 or len(sent1) == 0:
                     continue

@@ -24,6 +24,19 @@ mwparserfromhell = "^0.6.4"
 python-snappy = "^0.6.1"
 mojimoji = "^0.0.12"
 peft = "^0.3.0"
+pysen = {extras = ["format", "lint"], version = "^0.10.5"}
+
+[tool.pysen]
+version = "0.10"
+
+[tool.pysen.lint]
+enable_black = true
+enable_flake8 = true
+enable_isort = true
+enable_mypy = true
+mypy_preset = "strict"
+line_length = 88
+py_version = "py310"
 
 [build-system]
 requires = ["poetry-core"]

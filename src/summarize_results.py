@@ -6,9 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 from more_itertools import flatten
-from tap import Tap
-
 from src import utils
+from tap import Tap
 
 SUP_DATASETS = ["jsnli", "janli", "nu-snli", "nu-mnli", "nu-snli+mnli"]
 UNSUP_DATASETS = ["wikipedia", "wiki40b", "bccwj", "cc100"]
@@ -94,14 +93,55 @@ def by_datasets(args: Args):
 
         for d in df.to_dict("records"):
             print(
-                f"| {d['dataset_name']}"
+                f"| {d['dataset_name']} "
                 f"| {d['best-dev']:.2f} | {d['jsick']:.2f} "
                 f"| {d['jsts-train']:.2f} | {d['jsts-val']:.2f} "
                 f"| {d['avg']:.2f} |"
             )
 
 
+def model_rank(args: Args):
+    print("model_rank")
+    overall = {}
+
+    for method in ["sup-simcse", "unsup-simcse"]:
+        print(method)
+        path = args.input_dir / method / "best.csv"
+        df = pd.read_csv(path)
+        data = defaultdict(dict)
+
+        for dataset_name, group_df in df.groupby("dataset_name"):
+            group_df = group_df.sort_values("avg", ascending=False)
+            for rank, model_name in enumerate(group_df["model_name"].tolist()):
+                data[dataset_name][model_name] = rank + 1
+
+        data: pd.Series = pd.DataFrame(data).mean(axis=1)
+        overall[method] = data
+
+    overall = pd.DataFrame(overall).sort_values(by="sup-simcse", ascending=True)
+    print(overall)
+
+
+def dataset_rank(args: Args):
+    print("dataset_rank")
+
+    for method in ["sup-simcse", "unsup-simcse"]:
+        path = args.input_dir / method / "best.csv"
+        df = pd.read_csv(path)
+        data = defaultdict(dict)
+
+        for model_name, group_df in df.groupby("model_name"):
+            group_df = group_df.sort_values("avg", ascending=False)
+            for rank, dataset_name in enumerate(group_df["dataset_name"].tolist()):
+                data[model_name][dataset_name] = rank + 1
+
+        data: pd.Series = pd.DataFrame(data).mean(axis=1).sort_values(ascending=True)
+        print(data)
+
+
 if __name__ == "__main__":
     args = Args().parse_args()
     by_models(args)
     by_datasets(args)
+    model_rank(args)
+    dataset_rank(args)

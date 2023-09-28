@@ -4,10 +4,9 @@ from typing import Callable
 import torch
 from scipy.stats import spearmanr
 from sklearn.metrics.pairwise import paired_cosine_distances
+from src import utils
 from torch import FloatTensor
 from tqdm import tqdm
-
-from src import utils
 
 # TODO: さまざまな距離関数による評価
 
@@ -107,7 +106,9 @@ class STSEvaluation:
         progress_bar: bool = True,
     ) -> dict[str, float]:
         if progress_bar:
-            iterator = tqdm(list(self.sts_evaluators.items()), dynamic_ncols=True, leave=False)
+            iterator = tqdm(
+                list(self.sts_evaluators.items()), dynamic_ncols=True, leave=False
+            )
         else:
             iterator = list(self.sts_evaluators.items())
 

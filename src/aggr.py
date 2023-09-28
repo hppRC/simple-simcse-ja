@@ -6,9 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 from more_itertools import flatten
-from tap import Tap
-
 from src import utils
+from tap import Tap
 
 LEARNING_RATES = [1e-5, 3e-5, 5e-5]
 BATCH_SIZES = [64, 128, 256, 512]
@@ -150,7 +149,11 @@ def complete_experiments(df: pd.DataFrame, method: str) -> pd.DataFrame:
 def main(args: Args):
     data = defaultdict(list)
 
-    dirs = [dir for dir in args.input_dir.glob("*") if not str(dir).startswith("outputs/prev")]
+    dirs = [
+        dir
+        for dir in args.input_dir.glob("*")
+        if not str(dir).startswith("outputs/prev")
+    ]
     paths = list(flatten(dir.glob("**/sts-metrics.json") for dir in dirs))
 
     with ThreadPoolExecutor(max_workers=256) as executor:
@@ -170,12 +173,16 @@ def main(args: Args):
 
         df = (
             df.groupby(config_columns, as_index=False)
-            .apply(lambda group: group.head(args.num_experiments).reset_index(drop=True))
+            .apply(
+                lambda group: group.head(args.num_experiments).reset_index(drop=True)
+            )
             .reset_index(drop=True)
         )
         print(method, len(df))
         df = df.groupby(config_columns, as_index=False).agg(
-            **{col: (col, "mean") for col in df.select_dtypes(include="number").columns},
+            **{
+                col: (col, "mean") for col in df.select_dtypes(include="number").columns
+            },
             count=("dataset_name", "size"),
         )
         print(method, len(df))
@@ -203,8 +210,12 @@ def main(args: Args):
 
         for dataset_name in df["dataset_name"].unique():
             dataset_output_dir = output_dir / dataset_name
-            utils.save_csv(df, dataset_output_dir / "all.csv", "dataset_name", dataset_name)
-            utils.save_csv(best_df, dataset_output_dir / "best.csv", "dataset_name", dataset_name)
+            utils.save_csv(
+                df, dataset_output_dir / "all.csv", "dataset_name", dataset_name
+            )
+            utils.save_csv(
+                best_df, dataset_output_dir / "best.csv", "dataset_name", dataset_name
+            )
 
 
 if __name__ == "__main__":

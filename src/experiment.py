@@ -4,17 +4,16 @@ from pathlib import Path
 
 import numpy as np
 import peft
+import src.utils as utils
 import torch
+from src.dataset import SupSimCSEDataset, UnsupSimCSEDataset
+from src.models import SimCSEModel
+from src.sts import STSEvaluation
 from tap import Tap
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, PreTrainedModel
 from transformers.tokenization_utils import BatchEncoding, PreTrainedTokenizer
-
-import src.utils as utils
-from src.dataset import SupSimCSEDataset, UnsupSimCSEDataset
-from src.models import SimCSEModel
-from src.sts import STSEvaluation
 
 
 class CommonArgs(Tap):
@@ -208,7 +207,9 @@ class Experiment:
         if self.args.use_lora:
             return peft.get_peft_model_state_dict(self.model.backbone)
         else:
-            return {k: v.detach().clone().cpu() for k, v in self.model.state_dict().items()}
+            return {
+                k: v.detach().clone().cpu() for k, v in self.model.state_dict().items()
+            }
 
     def log(self, metrics: dict) -> None:
         utils.log(metrics, self.args.output_dir / "log.csv")
