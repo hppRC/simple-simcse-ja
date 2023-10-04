@@ -395,3 +395,16 @@ fine-tuning元のモデルとしては、教師あり設定では`cl-tohoku/bert
 
 - https://tech.yellowback.net/posts/sentence-transformers-japanese-models
 - https://github.com/oshizo/JapaneseEmbeddingEval
+
+
+```bibtex
+@misc{
+  hayato-tsukagoshi-2023-simple-simcse-ja,
+  author = {Hayato Tsukagoshi},
+  title = {Japanese Simple-SimCSE},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/hppRC/simple-simcse-ja}}
+}
+```
