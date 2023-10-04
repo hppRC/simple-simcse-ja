@@ -139,9 +139,43 @@ def dataset_rank(args: Args):
         print(data)
 
 
+def batch_rank(args: Args):
+    print("batch_rank")
+
+    for method in ["sup-simcse", "unsup-simcse"]:
+        path = args.input_dir / method / "all.csv"
+        df = pd.read_csv(path)
+        data_df = {}
+
+        data = defaultdict(lambda: defaultdict(dict))
+        for key, group_df in df.groupby(["model_name", "dataset_name"]):
+            for lr, lr_group in group_df.groupby("lr"):
+                lr_group = lr_group.sort_values("avg", ascending=False)
+                for rank, batch_size in enumerate(lr_group["batch_size"].tolist()):
+                    data[lr][key][batch_size] = rank + 1
+        for lr in data.keys():
+            data_df[lr] = (
+                pd.DataFrame(data[lr]).mean(axis=1).sort_values(ascending=True)
+            )
+        data_df["avg"] = pd.DataFrame(data_df).mean(axis=1).sort_values(ascending=True)
+        df = pd.DataFrame(data_df)
+        print(df)
+
+
+def counts(args: Args):
+    print("counts")
+
+    for method in ["sup-simcse", "unsup-simcse"]:
+        path = args.input_dir / method / "all.csv"
+        df = pd.read_csv(path)
+        print(df["count"].sum())
+
+
 if __name__ == "__main__":
     args = Args().parse_args()
     by_models(args)
     by_datasets(args)
     model_rank(args)
     dataset_rank(args)
+    batch_rank(args)
+    counts(args)

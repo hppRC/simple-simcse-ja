@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -6,6 +7,7 @@ import numpy as np
 import peft
 import src.utils as utils
 import torch
+from sentence_transformers import SentenceTransformer, models
 from src.dataset import SupSimCSEDataset, UnsupSimCSEDataset
 from src.models import SimCSEModel
 from src.sts import STSEvaluation
@@ -14,6 +16,13 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, PreTrainedModel
 from transformers.tokenization_utils import BatchEncoding, PreTrainedTokenizer
+
+TRAIN_DATASET_MAP = {
+    "jsnli": "shunk031/jsnli",
+    "janli": "hpprc/janli",
+    "wiki40b": "wiki40b",
+    "wikipedia": "wikipedia",
+}
 
 
 class CommonArgs(Tap):
@@ -36,6 +45,9 @@ class CommonArgs(Tap):
 
     use_lora: bool = False
     use_jumanpp: bool = False
+
+    save_model: bool = False
+    save_model_name: str = None
 
     num_training_examples: int = 2**20
     num_eval_logging: int = 2**6
@@ -219,6 +231,22 @@ class Experiment:
             f"loss: {metrics['loss']:2.6f}       \t"
             f"sts-dev: {metrics['sts-dev']:.4f}"
         )
+
+    def save_model(self):
+        backbone = models.Transformer(self.args.model_name)
+        backbone.auto_model.load_state_dict(self.model.backbone.state_dict())
+        pooling = models.Pooling(
+            word_embedding_dimension=self.model.backbone.config.hidden_size,
+            pooling_mode=self.args.pooling,
+        )
+
+        model = SentenceTransformer(modules=[backbone, pooling])
+        train_dataset_name = TRAIN_DATASET_MAP.get(
+            self.args.dataset_name, self.args.dataset_name
+        )
+        model.save(path=str(self.args.output_dir), train_datasets=[train_dataset_name])
+
+        print(f"saved at {self.args.output_dir}")
 
 
 class UnsupSimCSEExperiment(Experiment):

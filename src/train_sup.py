@@ -70,22 +70,15 @@ def main(args: Args):
                     sent1 = exp.model.forward(**batch.sent1)
                     hard_neg = exp.model.forward(**batch.hard_neg)
 
-                sim_mat_1st = F.cosine_similarity(
-                    sent0.unsqueeze(1), sent1.unsqueeze(0), dim=-1
-                )
-                sim_mat_2nd = F.cosine_similarity(
-                    sent0.unsqueeze(1), hard_neg.unsqueeze(0), dim=-1
-                )
+                sim_mat_1st = F.cosine_similarity(sent0.unsqueeze(1), sent1.unsqueeze(0), dim=-1)
+                sim_mat_2nd = F.cosine_similarity(sent0.unsqueeze(1), hard_neg.unsqueeze(0), dim=-1)
 
                 sim_mat = torch.cat([sim_mat_1st, sim_mat_2nd], dim=1)
                 sim_mat = sim_mat / args.temperature
 
-                labels = (
-                    torch.arange(sim_mat.size(0))
-                    .long()
-                    .to(args.device, non_blocking=True)
-                )
+                labels = torch.arange(sim_mat.size(0)).long().to(args.device, non_blocking=True)
                 loss = F.cross_entropy(sim_mat, labels)
+
                 train_losses.append(float(loss.item()))
 
                 optimizer.zero_grad()
@@ -118,6 +111,7 @@ def main(args: Args):
                         "sts-dev": dev_score,
                     }
                     exp.log(val_metrics)
+                    print(loss1.item(), loss2.item())
                     train_losses = []
 
                     exp.model.train()
@@ -143,6 +137,9 @@ def main(args: Args):
     sts_metrics = exp.sts_test()
     utils.save_json(sts_metrics, args.output_dir / "sts-metrics.json")
     utils.save_config(args, args.output_dir / "config.json")
+
+    if args.save_model:
+        exp.save_model()
 
 
 if __name__ == "__main__":

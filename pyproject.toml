@@ -24,7 +24,9 @@ mwparserfromhell = "^0.6.4"
 python-snappy = "^0.6.1"
 mojimoji = "^0.0.12"
 peft = "^0.3.0"
-pysen = {extras = ["format", "lint"], version = "^0.10.5"}
+pysen = { extras = ["lint"], version = "^0.10.5" }
+sentence-transformers = {git = "https://github.com/UKPLab/sentence-transformers.git"}
+openai = "^0.28.1"
 
 [tool.pysen]
 version = "0.10"

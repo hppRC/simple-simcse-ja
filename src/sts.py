@@ -32,6 +32,7 @@ class STSEvaluatorBase:
     def __call__(self, encode: Callable[[list[str]], FloatTensor]) -> float:
         embeddings1 = encode(self.sentences1)
         embeddings2 = encode(self.sentences2)
+
         # you can use any similarity function you want ↓
         cosine_scores = 1 - paired_cosine_distances(embeddings1, embeddings2)
         spearman, _ = spearmanr(self.scores, cosine_scores)
@@ -106,9 +107,7 @@ class STSEvaluation:
         progress_bar: bool = True,
     ) -> dict[str, float]:
         if progress_bar:
-            iterator = tqdm(
-                list(self.sts_evaluators.items()), dynamic_ncols=True, leave=False
-            )
+            iterator = tqdm(list(self.sts_evaluators.items()), dynamic_ncols=True, leave=False)
         else:
             iterator = list(self.sts_evaluators.items())
 

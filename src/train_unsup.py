@@ -134,6 +134,9 @@ def main(args: Args):
     utils.save_json(sts_metrics, args.output_dir / "sts-metrics.json")
     utils.save_config(args, args.output_dir / "config.json")
 
+    if args.save_model:
+        exp.save_model()
+
 
 if __name__ == "__main__":
     args = Args().parse_args()
