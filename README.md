@@ -125,6 +125,9 @@ SimCSEは乱数シード値やハイパラによって性能がブレやすい�
 | [xlm-roberta-base](https://huggingface.co/xlm-roberta-base)                                                               |    80.29    |    78.42     |    72.54     |   76.02    |   75.66   |
 | [studio-ousia/mluke-base-lite](https://huggingface.co/studio-ousia/mluke-base-lite)                                       |    83.48    |    81.96     |    74.97     |   78.47    |   78.47   |
 
+JSICK (val)は実験時に開発セットとして用いたデータセットです。
+そのため、JSICK (val)は最終的な評価スコアに含めるのに相応しくないため、平均性能を示す`Avg.`はJSICK (test), JSTS (train), JSTS (val)の評価スコアを平均した値になっています。
+
 表から、東北大BERTが比較的高い性能を示していることがわかり、早稲田大・京大のRoBERTaが近い性能を示していることがわかります。
 また、文字レベルのモデルや、多言語モデルの性能は、比較的低めの性能になっています。
 
