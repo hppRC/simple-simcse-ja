@@ -83,7 +83,7 @@ embeddings = model.encode(sentences)
 ## 評価設定
 
 評価タスクとして文類似度(Semantic Textual Similarity)タスクを用いました。
-評価データセットとしてJSICK ([GitHub](https://github.com/verypluming/JSICK), [HuggingFace]((https://huggingface.co/datasets/hpprc/jsick))と[JSTS](https://huggingface.co/datasets/shunk031/JGLUE)を用いました。
+評価データセットとしてJSICK ([GitHub](https://github.com/verypluming/JSICK), [HuggingFace](https://huggingface.co/datasets/hpprc/jsick))と[JSTS](https://huggingface.co/datasets/shunk031/JGLUE)を用いました。
 
 このうち、JSICKの開発(val)セットを文埋め込みモデル訓練中の開発セットとして用い、JSICKのテスト(test)セットとJSTSの訓練(train)・開発(val)セットを最終的な評価に用いました。
 つまり、ハイパーパラメータ探索に利用した評価セットは、開発セットとして用いたJSICKの開発セットになります。
