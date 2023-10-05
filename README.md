@@ -381,7 +381,7 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 表から、全体として今回公開したモデルが最もよい性能を示していることがわかります。
 また、OpenAIのtext-embedding-ada-002よりも高い性能になっている点は注目に値するでしょう。
 
-さらに、[cl-nagoya/unsup-simcse-ja-large](https://huggingface.co/cl-nagoya/unsup-simcse-ja-large)などUnsupervised SimCSEによってfine-tuningされた文埋め込みモデルの性能が、教師あり学習された他のモデルの性能と遜色ない性能を発揮していることも特筆すべき点と言えるでしょう。
+さらに、[cl-nagoya/unsup-simcse-ja-large](https://huggingface.co/cl-nagoya/unsup-simcse-ja-large)などUnsupervised SimCSEによってfine-tuningされた文埋め込みモデルの性能が、教師あり学習された他のモデルと遜色ないレベルであることも特筆すべき点と言えるでしょう。
 
 注意として、PKSHA社の文埋め込みモデルはJSTSの開発セットを訓練中の開発セットとして利用しているので、本実験の結果とは直接比較できません。
 また、この評価結果はSTSタスクに限定されたものであり、情報検索タスクなど異なるタスクでの汎用性を保証するものではありません。

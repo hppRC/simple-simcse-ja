@@ -149,11 +149,7 @@ def complete_experiments(df: pd.DataFrame, method: str) -> pd.DataFrame:
 def main(args: Args):
     data = defaultdict(list)
 
-    dirs = [
-        dir
-        for dir in args.input_dir.glob("*")
-        if not str(dir).startswith("outputs/prev")
-    ]
+    dirs = [dir for dir in args.input_dir.glob("*") if not str(dir).startswith("outputs/prev")]
     paths = list(flatten(dir.glob("**/sts-metrics.json") for dir in dirs))
 
     with ThreadPoolExecutor(max_workers=256) as executor:
@@ -173,16 +169,12 @@ def main(args: Args):
 
         df = (
             df.groupby(config_columns, as_index=False)
-            .apply(
-                lambda group: group.head(args.num_experiments).reset_index(drop=True)
-            )
+            .apply(lambda group: group.head(args.num_experiments).reset_index(drop=True))
             .reset_index(drop=True)
         )
         print(method, len(df))
         df = df.groupby(config_columns, as_index=False).agg(
-            **{
-                col: (col, "mean") for col in df.select_dtypes(include="number").columns
-            },
+            **{col: (col, "mean") for col in df.select_dtypes(include="number").columns},
             count=("dataset_name", "size"),
         )
         print(method, len(df))
@@ -209,13 +201,14 @@ def main(args: Args):
         utils.save_csv(best_df, output_dir / "best.csv")
 
         for dataset_name in df["dataset_name"].unique():
-            dataset_output_dir = output_dir / dataset_name
-            utils.save_csv(
-                df, dataset_output_dir / "all.csv", "dataset_name", dataset_name
-            )
-            utils.save_csv(
-                best_df, dataset_output_dir / "best.csv", "dataset_name", dataset_name
-            )
+            dataset_output_dir = output_dir / "datasets" / dataset_name
+            utils.save_csv(df, dataset_output_dir / "all.csv", "dataset_name", dataset_name)
+            utils.save_csv(best_df, dataset_output_dir / "best.csv", "dataset_name", dataset_name)
+
+        for model_name in df["model_name"].unique():
+            model_output_dir = output_dir / "models" / model_name
+            utils.save_csv(df, model_output_dir / "all.csv", "model_name", model_name)
+            utils.save_csv(best_df, model_output_dir / "best.csv", "model_name", model_name)
 
 
 if __name__ == "__main__":

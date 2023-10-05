@@ -1,1 +1,0 @@
-model_name,dataset_name,lr,batch_size,best-epoch,best-step,best-dev,jsick,jsts-val,jsts-train,avg,count
