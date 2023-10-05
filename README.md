@@ -336,7 +336,8 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 
 
 また、公開したモデルと、既存の日本語対応文埋め込みモデルについて、評価結果を比較したものが以下の表になります。
-評価には`src/evaluate.py`を用いています。
+補助的な比較対象として、事前学習済み言語モデルをfine-tuningせずに、そのまま文埋め込みモデルとして用いた場合の結果も示しています。
+評価には`src/evaluate.py`を用いました。
 
 | Model                                                                                                                            | JSICK (val) | JSICK (test) | JSTS (train) | JSTS (val) |   Avg.    |
 | -------------------------------------------------------------------------------------------------------------------------------- | :---------: | :----------: | :----------: | :--------: | :-------: |
@@ -349,6 +350,7 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 | [pkshatech/simcse-ja-bert-base-clcmlp](https://huggingface.co/pkshatech/simcse-ja-bert-base-clcmlp)                              |    74.47    |    73.46     |    78.05     |   80.14    |   77.21   |
 | [colorfulscoop/sbert-base-ja](https://huggingface.co/colorfulscoop/sbert-base-ja)                                                |    67.19    |    65.73     |    74.16     |   74.24    |   71.38   |
 | [sonoisa/sentence-luke-japanese-base-lite](https://huggingface.co/sonoisa/sentence-luke-japanese-base-lite)                      |    78.76    |    77.26     |    80.55     |   82.54    |   80.11   |
+| [oshizo/sbert-jsnli-luke-japanese-base-lite](https://huggingface.co/oshizo/sbert-jsnli-luke-japanese-base-lite)                  |    72.96    |    72.60     |    77.88     |   81.09    |   77.19   |
 |                                                                                                                                  |             |              |              |            |           |
 | [MU-Kindai/Japanese-SimCSE-BERT-large-sup](https://huggingface.co/MU-Kindai/Japanese-SimCSE-BERT-large-sup)                      |    77.06    |    77.48     |    70.83     |   75.83    |   74.71   |
 | [MU-Kindai/Japanese-SimCSE-BERT-base-sup](https://huggingface.co/MU-Kindai/Japanese-SimCSE-BERT-base-sup)                        |    74.10    |    74.19     |    70.08     |   73.26    |   72.51   |
@@ -356,6 +358,10 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 | [MU-Kindai/Japanese-SimCSE-BERT-base-unsup](https://huggingface.co/MU-Kindai/Japanese-SimCSE-BERT-base-unsup)                    |    77.25    |    77.44     |    72.84     |   77.12    |   75.80   |
 | [MU-Kindai/Japanese-MixCSE-BERT-base](https://huggingface.co/MU-Kindai/Japanese-MixCSE-BERT-base)                                |    76.72    |    76.94     |    72.40     |   76.23    |   75.19   |
 | [MU-Kindai/Japanese-DiffCSE-BERT-base](https://huggingface.co/MU-Kindai/Japanese-DiffCSE-BERT-base)                              |    75.61    |    75.83     |    71.62     |   75.81    |   74.42   |
+|                                                                                                                                  |             |              |              |            |           |
+| [intfloat/multilingual-e5-small](https://huggingface.co/intfloat/multilingual-e5-small)                                          |    82.01    |    81.38     |    74.48     |   78.92    |   78.26   |
+| [intfloat/multilingual-e5-base](https://huggingface.co/intfloat/multilingual-e5-base)                                            |    81.25    |    80.56     |    76.04     |   79.65    |   78.75   |
+| [intfloat/multilingual-e5-large](https://huggingface.co/intfloat/multilingual-e5-large)                                          |    80.57    |    79.39     |    79.16     |   81.85    |   80.13   |
 |                                                                                                                                  |             |              |              |            |           |
 | [sentence-transformers/LaBSE](https://huggingface.co/sentence-transformers/LaBSE)                                                |    76.54    |    76.77     |    72.15     |   76.12    |   75.02   |
 | [sentence-transformers/stsb-xlm-r-multilingual](https://huggingface.co/sentence-transformers/stsb-xlm-r-multilingual)            |    73.09    |    72.00     |    77.83     |   78.43    |   76.09   |
@@ -373,7 +379,9 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 | [text-embedding-ada-002](https://platform.openai.com/docs/api-reference/embeddings)                                              |    79.31    |    78.95     |    74.52     |   79.01    |   77.49   |
 
 表から、全体として今回公開したモデルが最もよい性能を示していることがわかります。
-また、OpenAIのtext-embedding-ada-002よりもより性能になっている点は注目に値します。
+また、OpenAIのtext-embedding-ada-002よりも高い性能になっている点は注目に値するでしょう。
+
+さらに、[cl-nagoya/unsup-simcse-ja-large](https://huggingface.co/cl-nagoya/unsup-simcse-ja-large)などUnsupervised SimCSEによってfine-tuningされた文埋め込みモデルの性能が、教師あり学習された他のモデルの性能と遜色ない性能を発揮していることも特筆すべき点と言えるでしょう。
 
 注意として、PKSHA社の文埋め込みモデルはJSTSの開発セットを訓練中の開発セットとして利用しているので、本実験の結果とは直接比較できません。
 また、この評価結果はSTSタスクに限定されたものであり、情報検索タスクなど異なるタスクでの汎用性を保証するものではありません。
