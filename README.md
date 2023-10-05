@@ -1,6 +1,6 @@
 # Japanese Simple-SimCSE
 
-文埋め込みは自然言語文の蜜ベクトル表現であり、類似文検索や質問応答、最近では検索補助付き生成(Retrieval Augmented Generation: RAG)に盛んに利用されています。
+文埋め込みは自然言語文の密ベクトル表現であり、類似文検索や質問応答、最近では検索補助付き生成(Retrieval Augmented Generation: RAG)に盛んに利用されています。
 
 文埋め込みを構成する方法には様々な種類がありますが、近年では事前学習済み言語モデルに対して対照学習(Contrastive Learning)によるfine-tuningを施す手法が高い性能を示しています。
 その中でも代表的な手法が[SimCSE (**Sim**ple **C**ontrastive **S**entence **E**mbedding)](https://aclanthology.org/2021.emnlp-main.552)です。
