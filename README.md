@@ -420,7 +420,7 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 @misc{
   hayato-tsukagoshi-2023-simple-simcse-ja,
   author = {Hayato Tsukagoshi},
-  title = {Japanese Simple-SimCSE},
+  title = {Exploring Japanese Sentence Embedding Models using Contrastive Learning},
   year = {2023},
   publisher = {GitHub},
   journal = {GitHub repository},
