@@ -1,5 +1,13 @@
 # Japanese Simple-SimCSE
 
+## Updates
+
+実験設定・結果について詳細に記述したpreprintが公開されました！
+
+[Japanese SimCSE Technical Report](https://arxiv.org/abs/2310.19349)
+
+## Introduction
+
 文埋め込みは自然言語文の密ベクトル表現であり、類似文検索や質問応答、最近では検索補助付き生成(Retrieval Augmented Generation: RAG)に盛んに利用されています。
 
 文埋め込みを構成する方法には様々な種類がありますが、近年では事前学習済み言語モデルに対して対照学習(Contrastive Learning)によるfine-tuningを施す手法が高い性能を示しています。
