@@ -417,13 +417,15 @@ fine-tuning元のモデルとしては、`cl-tohoku/bert-large-japanese-v2`と`c
 
 
 ```bibtex
-@misc{
-  hayato-tsukagoshi-2023-simple-simcse-ja,
-  author = {Hayato Tsukagoshi},
-  title = {Exploring Japanese Sentence Embedding Models using Contrastive Learning},
-  year = {2023},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/hppRC/simple-simcse-ja}}
+@article{
+    tsukagoshi2023JapaneseSimCSE,
+    title={{Japanese SimCSE Technical Report}}, 
+    author={Hayato Tsukagoshi and Ryohei Sasano and Koichi Takeda},
+    year={2023},
+    eprint={2310.19349},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL},
+    journal={arXiv:2310.19349},
+    url = {https://arxiv.org/abs/2310.19349},
 }
 ```
