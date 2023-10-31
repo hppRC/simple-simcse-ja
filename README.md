@@ -2,9 +2,9 @@
 
 ## Updates
 
-実験設定・結果について詳細に記述したpreprintが公開されました！
+実験設定・結果について詳細に記述したTechnical Reportをpreprintとして公開しました。
 
-[Japanese SimCSE Technical Report](https://arxiv.org/abs/2310.19349)
+[Tsukagoshi et al., 2023. Japanese SimCSE Technical Report](https://arxiv.org/abs/2310.19349)
 
 ## Introduction
 
